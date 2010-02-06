@@ -1,0 +1,80 @@
+#!/usr/bin/env ruby
+
+PLUGINS = YAML.load <<EOD
+---
+  msanders:
+    - snipmate.vim
+  tpope:
+    - vim-abolish
+    - vim-cucumber
+    - vim-fugitive
+    - vim-git
+    - vim-haml
+    - vim-rails
+    - vim-repeat
+    - vim-surround
+    - vim-unimpaired
+    - vim-vividchalk
+  scrooloose:
+    - nerdtree
+    - nerdcommenter
+EOD
+
+def windows?
+  RUBY_PLATFORM =~ /(win|w)32$/
+end
+
+def got_git?
+  begin
+    `git --version`
+  rescue
+    false
+  end
+end
+
+def get_repo(author, repo)
+  if File.exists? "#{DOTVIM}/bundle/#{repo}"
+    puts "Pulling lates from #{repo}"
+    FileUtils.cd "#{DOTVIM}/bundle/#{repo}"
+    system "git pull origin master"
+  else
+    puts "Cloning repo #{repo}"
+    FileUtils.cd "#{DOTVIM}/bundle/"
+    system "git clone git://github.com/#{author}/#{repo}.git"
+  end
+end
+
+DOTVIM = File.expand_path("~/#{windows? ? 'vimfiles' : '.vim'}")
+VIMRC = File.expand_path("~/#{windows? ? '_vimrc' : '.vimrc'}")
+
+puts "You need git." unless got_git?
+autoload_dir = "#{DOTVIM}/autoload/"
+bundle_dir = "#{DOTVIM}/bundle/"
+FileUtils.mkdir_p(autoload_dir)
+FileUtils.mkdir_p(bundle_dir)
+FileUtils.cd bundle_dir
+get_repo('tpope', 'vim-pathogen')
+FileUtils.cp "#{bundle_dir}vim-pathogen/autoload/pathogen.vim", autoload_dir
+pathogen_cmd="call pathogen#runtime_append_all_bundles()"
+
+found = false
+File.foreach(VIMRC) do |line|
+  if line.include? pathogen_cmd
+    found = true
+    break
+  end
+end
+
+unless found
+  File.open(VIMRC, 'a+') do |item|
+    item.puts
+    item.puts pathogen_cmd
+  end
+end
+
+PLUGINS.each do |author, plugins|
+  plugins.each do |item|
+    get_repo(author, item)
+  end
+end
+
