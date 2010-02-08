@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 
+require 'yaml'
+require 'fileutils'
+
 PLUGINS = YAML.load <<EOD
 ---
   msanders:
