@@ -48,6 +48,16 @@ def get_repo(author, repo)
   end
 end
 
+def found_in_vimrc?(cmd)
+  File.foreach(VIMRC) do |line|
+    if line.include? cmd
+      return true
+    end
+  end
+  return false
+end
+
+
 DOTVIM = File.expand_path("~/#{windows? ? 'vimfiles' : '.vim'}")
 VIMRC = File.expand_path("~/#{windows? ? '_vimrc' : '.vimrc'}")
 
@@ -60,19 +70,13 @@ FileUtils.cd bundle_dir
 get_repo('tpope', 'vim-pathogen')
 FileUtils.cp "#{bundle_dir}vim-pathogen/autoload/pathogen.vim", autoload_dir
 pathogen_cmd="call pathogen#runtime_append_all_bundles()"
+helptags_cmd="call pathogen#helptags()"
 
-found = false
-File.foreach(VIMRC) do |line|
-  if line.include? pathogen_cmd
-    found = true
-    break
-  end
-end
-
-unless found
+unless found_in_vimrc? pathogen_cmd
   File.open(VIMRC, 'a+') do |item|
     item.puts
     item.puts pathogen_cmd
+    item.puts helptags_cmd
   end
 end
 
