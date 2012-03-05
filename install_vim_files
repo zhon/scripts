@@ -5,7 +5,7 @@ require 'fileutils'
 
 PLUGINS = YAML.load <<EOD
 ---
-  digitaltoad
+  digitaltoad:
     - vim-jade
   godlygeek:
     - tabular
