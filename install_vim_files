@@ -61,6 +61,26 @@ def found_in_vimrc?(cmd)
   return false
 end
 
+def add_pathogen_cmd_to_top
+  require 'tempfile'
+  require 'fileutils'
+  tmp = Tempfile.new('install_vim')
+  begin
+    tmp.puts PATHOGEN_CMD
+    tmp.puts HELPTAGS_CMD
+    tmp.puts
+    IO.readlines(VIMRC).each do |item|
+      tmp.print item
+    end
+    tmp.close
+    FileUtils.copy_file(tmp.path, VIMRC)
+  ensure
+    tmp.close
+    tmp.unlink
+  end
+end
+
+
 
 DOTVIM = File.expand_path("~/#{windows? ? 'vimfiles' : '.vim'}")
 VIMRC = File.expand_path("~/#{windows? ? '_vimrc' : '.vimrc'}")
@@ -73,16 +93,10 @@ FileUtils.mkdir_p(bundle_dir)
 FileUtils.cd bundle_dir
 get_repo('tpope', 'vim-pathogen')
 FileUtils.cp "#{bundle_dir}vim-pathogen/autoload/pathogen.vim", autoload_dir
-pathogen_cmd="call pathogen#runtime_append_all_bundles()"
-helptags_cmd="call pathogen#helptags()"
+PATHOGEN_CMD="call pathogen#infect()"
+HELPTAGS_CMD="call pathogen#helptags()"
 
-unless found_in_vimrc? pathogen_cmd
-  File.open(VIMRC, 'a+') do |item|
-    item.puts
-    item.puts pathogen_cmd
-    item.puts helptags_cmd
-  end
-end
+add_pathogen_cmd_to_top unless found_in_vimrc? PATHOGEN_CMD
 
 PLUGINS.each do |author, plugins|
   plugins.each do |item|
