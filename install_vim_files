@@ -20,6 +20,7 @@ PLUGINS = YAML.load <<EOD
     - vim-haml
     - vim-rails
     - vim-repeat
+    - vim-sensible
     - vim-surround
     - vim-unimpaired
     - vim-vividchalk
