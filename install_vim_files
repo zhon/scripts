@@ -9,6 +9,8 @@ PLUGINS = YAML.load <<EOD
     - vim-jade
   godlygeek:
     - tabular
+  lukerandall:
+    - haskellmode-vim
   msanders:
     - snipmate.vim
   tpope:
