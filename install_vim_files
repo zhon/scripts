@@ -13,6 +13,8 @@ PLUGINS = YAML.load <<EOD
     - haskellmode-vim
   msanders:
     - snipmate.vim
+  pangloss:
+    - vim-javascript
   tpope:
     - vim-abolish
     - vim-cucumber
