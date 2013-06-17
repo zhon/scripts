@@ -58,6 +58,8 @@ def get_repo(author, repo)
 end
 
 def found_in_vimrc?(cmd)
+  FileUtils.touch VIMRC unless File.exists? VIMRC
+
   File.foreach(VIMRC) do |line|
     if line.include? cmd
       return true
